@@ -15,7 +15,7 @@ Flint is a powerful and efficient file and directory comparison tool written in 
 To install Flint, make sure you have Go installed on your system, then run:
 
 ```
-go get github.com/yourusername/flint
+go get github.com/satyam-jha-16/flint
 ```
 Usage```
 flint [path old] [path new]```
