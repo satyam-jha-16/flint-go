@@ -8,7 +8,7 @@ var (
 	Magenta = "\033[35m"
 )
 
-const helpMess = `flint- Compare Folder and Files
+const helpMessage = `flint- Compare Folder and Files
 Usage:
 $ flint [path old] [path new]
 

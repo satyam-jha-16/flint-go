@@ -51,26 +51,12 @@ func CompareDir(oldRootPath string, newRootPath string) (*Compare, error) {
 	for path := range sameTree {
 
 		pathOldFile := oldRootPath + path
-
-		oldFile, err := GetFileInfo(pathOldFile)
-		if err != nil {
-			return nil, err
-		}
-		if oldFile.IsDir {
-			break
-		}
-
 		pathNewFile := newRootPath + path
 
-		newFile, err := GetFileInfo(pathNewFile)
+		diff, err := CompareFiles(pathOldFile, pathNewFile)
 		if err != nil {
 			return nil, err
 		}
-		if newFile.IsDir {
-			break
-		}
-
-		diff := Diff(pathOldFile, oldFile.Data, pathNewFile, newFile.Data)
 
 		if diff != nil {
 
@@ -83,21 +69,50 @@ func CompareDir(oldRootPath string, newRootPath string) (*Compare, error) {
 
 }
 
+func CompareFiles(pathOldFile string, pathNewFile string) ([]byte, error) {
+
+	oldFile, err := GetFileInfo(pathOldFile)
+	if err != nil {
+		return nil, err
+	}
+	if oldFile.IsDir {
+		return nil, nil
+	}
+
+	newFile, err := GetFileInfo(pathNewFile)
+	if err != nil {
+		return nil, err
+	}
+	if newFile.IsDir {
+		return nil, nil
+	}
+
+	diff := Diff(pathOldFile, oldFile.Data, pathNewFile, newFile.Data)
+
+	return diff, nil
+
+}
+
 func LogComparedData(compare *Compare) {
-	fmt.Println(Red + "## Removed:" + Reset)
+	if compare.RemovedFile != nil {
+		fmt.Println(Red + "## Removed:" + Reset)
 
-	for _, path := range compare.RemovedFile {
-		fmt.Printf("- %s\n", path)
+		for _, path := range compare.RemovedFile {
+			fmt.Printf("- %s\n", path)
+		}
 	}
-	fmt.Println()
-	fmt.Println(Green + "## Created:" + Reset)
-	for _, path := range compare.CreatedFile {
-		fmt.Printf("+ %s\n", path)
+	if compare.CreatedFile != nil {
+		fmt.Println()
+		fmt.Println(Green + "## Created:" + Reset)
+		for _, path := range compare.CreatedFile {
+			fmt.Printf("+ %s\n", path)
+		}
 	}
-
-	fmt.Println()
-	fmt.Println(Yellow + "## Changed:" + Reset)
-	for _, path := range compare.Updated {
-		fmt.Printf("%s", path)
+	if compare.Updated != nil {
+		fmt.Println()
+		fmt.Println(Yellow + "## Changed:" + Reset)
+		for _, path := range compare.Updated {
+			fmt.Printf("%s", path)
+		}
 	}
 }
